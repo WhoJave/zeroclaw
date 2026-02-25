@@ -1234,6 +1234,28 @@ pub async fn run(
             "browser_open",
             "Open approved HTTPS URLs in system browser (allowlist-only, no scraping)",
         ));
+        tool_descs.push((
+            "browser",
+            "Automate web browsing (open, navigate, click, extract). Backends: agent-browser, rust-native, computer_use.",
+        ));
+    }
+    if config.http_request.enabled {
+        tool_descs.push((
+            "http_request",
+            "Make HTTP requests to external APIs (GET/POST/etc). Allowlist-only domains and safe limits apply.",
+        ));
+    }
+    if config.web_fetch.enabled {
+        tool_descs.push((
+            "web_fetch",
+            "Fetch a web page and return markdown/text for analysis. Allowlist-only domains apply.",
+        ));
+    }
+    if config.web_search.enabled {
+        tool_descs.push((
+            "web_search_tool",
+            "Search the web and return results (titles, URLs, snippets). Use for research and discovery.",
+        ));
     }
     if config.composio.enabled {
         tool_descs.push((
@@ -1643,6 +1665,25 @@ pub async fn process_message(config: Config, message: &str) -> Result<String> {
     ];
     if config.browser.enabled {
         tool_descs.push(("browser_open", "Open approved URLs in browser."));
+        tool_descs.push((
+            "browser",
+            "Automate web browsing (open, navigate, click, extract).",
+        ));
+    }
+    if config.http_request.enabled {
+        tool_descs.push((
+            "http_request",
+            "Make HTTP requests to external APIs (GET/POST/etc).",
+        ));
+    }
+    if config.web_fetch.enabled {
+        tool_descs.push(("web_fetch", "Fetch a web page and return markdown/text."));
+    }
+    if config.web_search.enabled {
+        tool_descs.push((
+            "web_search_tool",
+            "Search the web and return results (titles, URLs, snippets).",
+        ));
     }
     if config.composio.enabled {
         tool_descs.push(("composio", "Execute actions on 1000+ apps via Composio."));

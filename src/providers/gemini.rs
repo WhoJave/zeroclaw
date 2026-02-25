@@ -1375,8 +1375,8 @@ mod tests {
     fn oauth_refresh_form_omits_client_credentials_when_missing() {
         let form = build_oauth_refresh_form("refresh-token", None, None);
         let map: std::collections::HashMap<_, _> = form.into_iter().collect();
-        assert!(map.get("client_id").is_none());
-        assert!(map.get("client_secret").is_none());
+        assert!(!map.contains_key("client_id"));
+        assert!(!map.contains_key("client_secret"));
     }
 
     #[test]
@@ -1614,7 +1614,7 @@ mod tests {
         let json: serde_json::Value = serde_json::from_slice(payload).unwrap();
 
         assert_eq!(json["model"], "gemini-2.0-flash");
-        assert!(json.get("generationConfig").is_none());
+        assert!(!json.get("generationConfig").is_some());
         assert!(json.get("request").is_some());
         assert!(json["request"].get("generationConfig").is_some());
     }

@@ -3994,7 +3994,10 @@ mod tests {
 
     #[test]
     fn telegram_split_many_short_lines() {
-        let msg: String = (0..1000).map(|i| format!("line {i}\n")).collect();
+        let mut msg = String::new();
+        for i in 0..1000 {
+            let _ = writeln!(msg, "line {i}");
+        }
         let parts = split_message_for_telegram(&msg);
         for part in &parts {
             assert!(
