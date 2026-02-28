@@ -2292,103 +2292,6 @@ async fn handle_runtime_command_if_needed(
                 }
             }
         }
-        ChannelRuntimeCommand::ApprovePendingRequest(raw_request_id) => {
-            let request_id = raw_request_id.trim().to_string();
-            if request_id.is_empty() {
-                "Usage: `/approve-allow <request-id>`".to_string()
-            } else {
-                match ctx.approval_manager.confirm_non_cli_pending_request(
-                    &request_id,
-                    sender,
-                    source_channel,
-                    reply_target,
-                ) {
-                    Ok(req) => {
-                        let tool_name = req.tool_name;
-                        ctx.approval_manager
-                            .record_non_cli_pending_resolution(&request_id, ApprovalResponse::Yes);
-                        runtime_trace::record_event(
-                            "approval_request_allowed",
-                            Some(source_channel),
-                            None,
-                            None,
-                            None,
-                            Some(true),
-                            Some("pending request allowed"),
-                            serde_json::json!({
-                                "request_id": request_id,
-                                "tool_name": tool_name,
-                                "sender": sender,
-                                "channel": source_channel,
-                            }),
-                        );
-                        if tool_name == APPROVAL_ALL_TOOLS_ONCE_TOKEN {
-                            let remaining = ctx.approval_manager.grant_non_cli_allow_all_once();
-                            format!(
-                                "Approved pending request `{request_id}`.\nGranted one-time all-tools bypass for the next non-CLI execution turn.\nQueued one-time all-tools bypass tokens: `{remaining}`."
-                            )
-                        } else {
-                            format!(
-                                "Approved pending request `{request_id}` for `{tool_name}`.\nDecision recorded as `yes` for the waiting non-CLI approval flow."
-                            )
-                        }
-                    }
-                    Err(PendingApprovalError::NotFound) => {
-                        runtime_trace::record_event(
-                            "approval_request_allowed",
-                            Some(source_channel),
-                            None,
-                            None,
-                            None,
-                            Some(false),
-                            Some("pending request not found"),
-                            serde_json::json!({
-                                "request_id": request_id,
-                                "sender": sender,
-                                "channel": source_channel,
-                            }),
-                        );
-                        format!("Pending approval request `{request_id}` was not found.")
-                    }
-                    Err(PendingApprovalError::Expired) => {
-                        runtime_trace::record_event(
-                            "approval_request_allowed",
-                            Some(source_channel),
-                            None,
-                            None,
-                            None,
-                            Some(false),
-                            Some("pending request expired"),
-                            serde_json::json!({
-                                "request_id": request_id,
-                                "sender": sender,
-                                "channel": source_channel,
-                            }),
-                        );
-                        format!("Pending approval request `{request_id}` has expired.")
-                    }
-                    Err(PendingApprovalError::RequesterMismatch) => {
-                        runtime_trace::record_event(
-                            "approval_request_allowed",
-                            Some(source_channel),
-                            None,
-                            None,
-                            None,
-                            Some(false),
-                            Some("pending request confirmer mismatch"),
-                            serde_json::json!({
-                                "request_id": request_id,
-                                "sender": sender,
-                                "channel": source_channel,
-                            }),
-                        );
-                        format!(
-                            "Pending approval request `{request_id}` can only be approved by the same sender in the same chat/channel that created it."
-                        )
-                    }
-                }
-            }
-        }
         ChannelRuntimeCommand::DenyToolApproval(raw_request_id) => {
             let request_id = raw_request_id.trim().to_string();
             if request_id.is_empty() {
@@ -2401,31 +2304,34 @@ async fn handle_runtime_command_if_needed(
                     reply_target,
                 ) {
                     Ok(req) => {
-                        let tool_name = req.tool_name;
-                        ctx.approval_manager
-                            .record_non_cli_pending_resolution(&request_id, ApprovalResponse::No);
+                        ctx.approval_manager.record_non_cli_pending_resolution(
+                            &request_id,
+                            ApprovalResponse::No,
+                        );
                         runtime_trace::record_event(
-                            "approval_request_denied",
+                            "approval_request_rejected",
                             Some(source_channel),
                             None,
                             None,
                             None,
                             Some(true),
-                            Some("pending request denied"),
+                            Some("pending request rejected"),
                             serde_json::json!({
                                 "request_id": request_id,
-                                "tool_name": tool_name,
+                                "tool_name": req.tool_name,
                                 "sender": sender,
                                 "channel": source_channel,
                             }),
                         );
                         format!(
-                            "Denied pending request `{request_id}` for `{tool_name}`.\nDecision recorded as `no` for the waiting non-CLI approval flow."
+                            "Rejected approval request `{}` for `{}`.",
+                            req.request_id,
+                            approval_target_label(&req.tool_name)
                         )
                     }
                     Err(PendingApprovalError::NotFound) => {
                         runtime_trace::record_event(
-                            "approval_request_denied",
+                            "approval_request_rejected",
                             Some(source_channel),
                             None,
                             None,
@@ -2438,11 +2344,13 @@ async fn handle_runtime_command_if_needed(
                                 "channel": source_channel,
                             }),
                         );
-                        format!("Pending approval request `{request_id}` was not found.")
+                        format!(
+                            "Pending approval request `{request_id}` was not found. List requests with `/approve-pending`."
+                        )
                     }
                     Err(PendingApprovalError::Expired) => {
                         runtime_trace::record_event(
-                            "approval_request_denied",
+                            "approval_request_rejected",
                             Some(source_channel),
                             None,
                             None,
@@ -2459,13 +2367,13 @@ async fn handle_runtime_command_if_needed(
                     }
                     Err(PendingApprovalError::RequesterMismatch) => {
                         runtime_trace::record_event(
-                            "approval_request_denied",
+                            "approval_request_rejected",
                             Some(source_channel),
                             None,
                             None,
                             None,
                             Some(false),
-                            Some("pending request rejecter mismatch"),
+                            Some("pending request rejector mismatch"),
                             serde_json::json!({
                                 "request_id": request_id,
                                 "sender": sender,
