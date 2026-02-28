@@ -5,9 +5,9 @@ pub mod traits;
 pub use schema::{
     apply_runtime_proxy_to_builder, build_runtime_proxy_client,
     build_runtime_proxy_client_with_timeouts, runtime_proxy_config, set_runtime_proxy_config,
-    AckReactionChannelsConfig, AckReactionChatType, AckReactionConfig, AckReactionRuleConfig,
-    AckReactionStrategy, AgentConfig, AgentsIpcConfig, AuditConfig, AutonomyConfig,
-    BrowserComputerUseConfig, BrowserConfig, BuiltinHooksConfig, ChannelsConfig,
+    AckReactionChannelsConfig, AckReactionChatType, AckReactionConfig, AckReactionRuleAction,
+    AckReactionRuleConfig, AckReactionStrategy, AgentConfig, AgentsIpcConfig, AuditConfig,
+    AutonomyConfig, BrowserComputerUseConfig, BrowserConfig, BuiltinHooksConfig, ChannelsConfig,
     ClassificationRule, ComposioConfig, Config, CoordinationConfig, CostConfig, CronConfig,
     DelegateAgentConfig, DiscordConfig, DockerRuntimeConfig, EconomicConfig, EconomicTokenPricing,
     EmbeddingRouteConfig, EstopConfig, FeishuConfig, GatewayConfig, GroupReplyConfig,
