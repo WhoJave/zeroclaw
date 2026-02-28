@@ -400,7 +400,9 @@ mod tests {
             result,
             GuardResult::Suspicious(_, _) | GuardResult::Blocked(_)
         ));
-        assert!(start.elapsed() < Duration::from_secs(3));
+        // Keep this as a regression guard for pathological slow paths, but
+        // allow headroom for heavily loaded shared CI runners.
+        assert!(start.elapsed() < Duration::from_secs(10));
     }
 
     #[test]

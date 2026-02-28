@@ -926,8 +926,8 @@ mod tests {
         tracker.track_tokens(10_000_000, 0, "agent", Some(35.0));
         assert_eq!(tracker.get_survival_status(), SurvivalStatus::Struggling);
 
-        // Spend more to reach critical
-        tracker.track_tokens(10_000_000, 0, "agent", Some(25.0));
+        // Spend more to drop below 10% and reach critical
+        tracker.track_tokens(10_000_000, 0, "agent", Some(26.0));
         assert_eq!(tracker.get_survival_status(), SurvivalStatus::Critical);
 
         // Bankrupt
