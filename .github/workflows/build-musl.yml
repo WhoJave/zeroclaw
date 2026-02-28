@@ -1,7 +1,7 @@
 name: Build musl (glibc-free) binary
 
 on:
-  workflow_dispatch:          # manual trigger anytime
+  workflow_dispatch:
   push:
     branches: [main]
     tags: ['v*']
@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4305c38b25d97ef35a8ad1f985ccf2d2242004f2  # stable 2025-02-01
         with:
           targets: x86_64-unknown-linux-musl
 
@@ -27,13 +27,13 @@ jobs:
           cargo build --release --target x86_64-unknown-linux-musl
           ls -lh target/x86_64-unknown-linux-musl/release/zeroclaw
 
-      - name: Verify static binary (no glibc dependency)
+      - name: Verify static binary
         run: |
           ldd target/x86_64-unknown-linux-musl/release/zeroclaw || true
           file target/x86_64-unknown-linux-musl/release/zeroclaw
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08  # v4.6.1
         with:
           name: zeroclaw-x86_64-unknown-linux-musl
           path: target/x86_64-unknown-linux-musl/release/zeroclaw
@@ -41,7 +41,7 @@ jobs:
 
       - name: Create Release (on tag push)
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@c062e08bd532815e2082a85e87e3ef29c3e6d191  # v2.2.1
         with:
           files: target/x86_64-unknown-linux-musl/release/zeroclaw
           name: ${{ github.ref_name }}-musl
