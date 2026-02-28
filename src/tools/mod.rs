@@ -30,6 +30,7 @@ pub mod cron_runs;
 pub mod cron_update;
 pub mod delegate;
 pub mod delegate_coordination_status;
+pub mod docx_read;
 #[cfg(feature = "channel-lark")]
 pub mod feishu_doc;
 pub mod file_edit;
@@ -53,6 +54,7 @@ pub mod memory_forget;
 pub mod memory_recall;
 pub mod memory_store;
 pub mod model_routing_config;
+pub mod openclaw_migration;
 pub mod pdf_read;
 pub mod process;
 pub mod proxy_config;
@@ -88,6 +90,7 @@ pub use cron_runs::CronRunsTool;
 pub use cron_update::CronUpdateTool;
 pub use delegate::DelegateTool;
 pub use delegate_coordination_status::DelegateCoordinationStatusTool;
+pub use docx_read::DocxReadTool;
 #[cfg(feature = "channel-lark")]
 pub use feishu_doc::FeishuDocTool;
 pub use file_edit::FileEditTool;
@@ -109,6 +112,7 @@ pub use memory_forget::MemoryForgetTool;
 pub use memory_recall::MemoryRecallTool;
 pub use memory_store::MemoryStoreTool;
 pub use model_routing_config::ModelRoutingConfigTool;
+pub use openclaw_migration::OpenClawMigrationTool;
 pub use pdf_read::PdfReadTool;
 pub use process::ProcessTool;
 pub use proxy_config::ProxyConfigTool;
@@ -288,6 +292,7 @@ pub fn all_tools_with_runtime(
         Arc::new(ProxyConfigTool::new(config.clone(), security.clone())),
         Arc::new(WebAccessConfigTool::new(config.clone(), security.clone())),
         Arc::new(WebSearchConfigTool::new(config.clone(), security.clone())),
+        Arc::new(OpenClawMigrationTool::new(config.clone(), security.clone())),
         Arc::new(PushoverTool::new(
             security.clone(),
             workspace_dir.to_path_buf(),
@@ -664,6 +669,7 @@ mod tests {
         assert!(names.contains(&"proxy_config"));
         assert!(names.contains(&"web_access_config"));
         assert!(names.contains(&"web_search_config"));
+        assert!(names.contains(&"openclaw_migration"));
     }
 
     #[test]
@@ -708,6 +714,7 @@ mod tests {
         assert!(names.contains(&"proxy_config"));
         assert!(names.contains(&"web_access_config"));
         assert!(names.contains(&"web_search_config"));
+        assert!(names.contains(&"openclaw_migration"));
     }
 
     #[test]
