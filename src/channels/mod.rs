@@ -2167,7 +2167,8 @@ async fn handle_runtime_command_if_needed(
                 )
             }
         }
-        ChannelRuntimeCommand::ConfirmToolApproval(raw_request_id) => {
+        ChannelRuntimeCommand::ConfirmToolApproval(raw_request_id)
+        | ChannelRuntimeCommand::ApprovePendingRequest(raw_request_id) => {
             let request_id = raw_request_id.trim().to_string();
             if request_id.is_empty() {
                 "Usage: `/approve-confirm <request-id>`".to_string()
@@ -2179,6 +2180,10 @@ async fn handle_runtime_command_if_needed(
                     reply_target,
                 ) {
                     Ok(req) => {
+                        ctx.approval_manager.record_non_cli_pending_resolution(
+                            &request_id,
+                            ApprovalResponse::Yes,
+                        );
                         let tool_name = req.tool_name;
                         let mut approval_message = if tool_name == APPROVAL_ALL_TOOLS_ONCE_TOKEN {
                             let remaining = ctx.approval_manager.grant_non_cli_allow_all_once();
